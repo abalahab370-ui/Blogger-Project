@@ -8,6 +8,7 @@ const corsOptions = require("./config/corsOptions") ;
 const cookieParser = require("cookie-parser") ;
 const mongoose  = require("mongoose") ;
 const connectDB = require("./config/dbconnect") ;
+const verfieJWT = require("./Controllers/verfieJWT") ; 
 
 //Connecting to The DataBase : 
 connectDB() ;
@@ -36,7 +37,11 @@ app.use('/api' , require("./routing/login") ) ;
 
 app.use('/api/regist' , require("./routing/regist") ) ;
 
-//time for verfieJWT =-= !
+app.use( '/api/refresh' , require("./routing/refresh"))
+
+app.use(verfieJWT);
+
+//time for verfieJWT =-= !(refresh and verfie u will burnout ah coding life =*=)
 
 app.all( '/*' , (req ,res) => {
       return res.sendStatus(404) ;

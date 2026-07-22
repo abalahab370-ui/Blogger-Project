@@ -80,12 +80,9 @@ function initAuthPage() {
             }
 
             // 4. Role-based redirect
-            if (userRole === ROLES.ADMIN) {
-                window.location.href = '/admin.html';
-            } else {
+           
                 window.location.href = '/index.html';
-            }
-
+                
         } catch (err) {
             alert(err.message);
         }

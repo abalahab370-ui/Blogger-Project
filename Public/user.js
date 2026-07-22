@@ -62,7 +62,7 @@ async function refreshSession() {
         const payload = parseJwt(accessToken);
         currentUser = {
             username: payload?.userInfo?.username || 'User',
-            role: payload?.userInfo?.roles || payload?.userInfo?.role || ROLES.USER
+            roles: payload?.userInfo?.roles || payload?.userInfo?.role || ROLES.USER
         };
 
         return accessToken;
@@ -82,7 +82,7 @@ function updateHeaderUI() {
 
     if (greeting) greeting.innerText = currentUser.username;
     if (badge) {
-        const isAdmin = currentUser.role === 2020 ;
+        const isAdmin = parseInt(currentUser.roles) === 2020 ;
 
         badge.innerText = isAdmin ? 'Administrator' : 'Contributor';
         badge.className = `text-[10px] uppercase font-mono tracking-wider ${isAdmin ? 'text-purple-600 font-bold' : 'text-gray-400'}`;
@@ -93,7 +93,7 @@ function updateHeaderUI() {
  * Attach Submit, Search, and Logout event listeners
  */
 function setupEventListeners() {
-      
+
     const publishForm = document.getElementById('publishForm');
     const searchBar = document.getElementById('searchBar');
     const logoutBtn = document.getElementById('logoutBtn');
