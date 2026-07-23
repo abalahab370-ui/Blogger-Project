@@ -144,12 +144,12 @@ async function handleCreatePost(e) {
             body: JSON.stringify(cleanPayload)
         });
 
-        const data = await res.json();
 
         if (!res.ok) {
-            throw new Error(data.message || 'Failed to create post');
+            throw new Error('Failed to create post');
         }
 
+        
         // Clear Form Inputs
         titleInput.value = '';
         categoryInput.value = '';
@@ -195,16 +195,31 @@ async function fetchAndRenderPosts(searchQuery = '') {
             return;
         }
 
-        // Render posts directly into #dynamicFeed right under the search bar
+        // 1. Check admin status once before rendering
+        const isAdmin = parseInt(currentUser.roles) === 2020 ;
+        const adminLoggedIn = isAdmin;
+
+        // 2. Render posts directly into #dynamicFeed
         feedContainer.innerHTML = posts.map(post => `
-            <article class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3 hover:border-gray-300 transition">
+            <article class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3 hover:border-gray-300 transition relative">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
                         ${escapeHTML(post.category || 'General')}
                     </span>
-                    <span class="text-[11px] text-gray-400">
-                        ${post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Just now'}
-                    </span>
+
+                    <div class="flex items-center gap-3">
+                        <span class="text-[11px] text-gray-400">
+                            ${post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Just now'}
+                        </span>
+
+                        <!-- Conditionally injected Delete button for Admins only -->
+                        ${adminLoggedIn ? `
+                            <button onclick="handleDeletePost('${post._id}')" 
+                                    class="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer transition px-2 py-0.5 rounded hover:bg-red-50 border border-transparent hover:border-red-200">
+                                🗑️ Delete
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
 
                 <div>
@@ -222,6 +237,33 @@ async function fetchAndRenderPosts(searchQuery = '') {
             <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-xs text-center">
                 Failed to load articles.
             </div>`;
+    }
+}
+
+/**
+ * Admin Delete Request
+ */
+async function handleDeletePost(postId) {
+    if (!confirm('Are you sure you want to delete this article?')) return;
+
+    try {
+        const res = await fetch(`${POST_URL}?postId=${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || 'Failed to delete post');
+        }
+
+        // Re-fetch posts to immediately reflect deletion in UI
+        fetchAndRenderPosts();
+
+    } catch (err) {
+        alert(`catching an error : ${err.message}`);
     }
 }
 

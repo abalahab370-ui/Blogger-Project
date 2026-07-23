@@ -27,7 +27,7 @@ const refreshTokenControlle = async (req , res ) => {
                   if (err || !founduser.username === decoded.username ) {
                         return res.sendStatus(403) ; //forbidden cuz invalide token !
                   }
-                  const roles = Object.values(founduser.roles) ;
+                  const roles = Object.values(founduser.roles)[0] ;
                   const accessToken = jwt.sign(
                   {"userInfo" : {
                   username : founduser.username ,

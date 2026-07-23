@@ -39,9 +39,12 @@ app.use('/api/regist' , require("./routing/regist") ) ;
 
 app.use( '/api/refresh' , require("./routing/refresh"))
 
-app.use(verfieJWT);
+app.use( '/api/logout' , require("./routing/logout"));
 
 //time for verfieJWT =-= !(refresh and verfie u will burnout ah coding life =*=)
+app.use(verfieJWT);
+
+app.use( '/api/post' , require("./routing/post") ) ;
 
 app.all( '/*' , (req ,res) => {
       return res.sendStatus(404) ;
