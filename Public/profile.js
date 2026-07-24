@@ -26,9 +26,9 @@ function parseJwt(token) {
 }
 
 /**
- * Main Initializer called by index.html (<script>initUserHub();</script>)
+ * Main Initializer called by profile.html (<script>initProfileHub();</script>)
  */
-async function initUserHub() {
+async function initProfileHub() {
     const token = await refreshSession();
     if (!token) return;
 
@@ -67,13 +67,16 @@ async function refreshSession() {
 }
 
 /**
- * Updates Header User Info
+ * Updates Header User Info & Profile Title
  */
 function updateHeaderUI() {
     const greeting = document.getElementById('userGreeting');
     const badge = document.getElementById('userRoleBadge');
+    const profileHeaderName = document.getElementById('profileHeaderName');
 
     if (greeting) greeting.innerText = currentUser.username;
+    if (profileHeaderName) profileHeaderName.innerText = `${currentUser.username}'s Articles`;
+
     if (badge) {
         const isAdmin = parseInt(currentUser.roles) === 2020;
 
@@ -83,16 +86,14 @@ function updateHeaderUI() {
 }
 
 /**
- * Attach Submit, Search, and Logout event listeners
+ * Attach Search and Logout event listeners
  */
 function setupEventListeners() {
 
-    const publishForm = document.getElementById('publishForm');
     const searchBar = document.getElementById('searchBar');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    publishForm?.addEventListener('submit', handleCreatePost);
-
+    // Live Search Input for Personal Posts
     searchBar?.addEventListener('input', (e) => {
         clearTimeout(searchDebounceTimer);
         searchDebounceTimer = setTimeout(() => {
@@ -104,84 +105,36 @@ function setupEventListeners() {
 }
 
 /**
- * Sends POST request to /api/post with clean structure
- */
-async function handleCreatePost(e) {
-    e.preventDefault();
-
-    const titleInput = document.getElementById('title');
-    const categoryInput = document.getElementById('category');
-    const contentInput = document.getElementById('content');
-    const submitBtn = document.getElementById('submitPostBtn');
-
-    const cleanPayload = {
-        title: titleInput.value.trim(),
-        category: categoryInput.value.trim(),
-        content: contentInput.value.trim()
-    };
-
-    submitBtn.disabled = true;
-    submitBtn.innerText = 'Publishing...';
-
-    try {
-        const res = await fetch(POST_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify(cleanPayload)
-        });
-
-        if (!res.ok) {
-            throw new Error('Failed to create post');
-        }
-
-        titleInput.value = '';
-        categoryInput.value = '';
-        contentInput.value = '';
-
-        fetchAndRenderPosts();
-
-    } catch (err) {
-        alert(err.message);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Commit to Feed';
-    }
-}
-
-/**
- * Fetches posts from GET /api/post (or /api/post?search=...) 
+ * Fetches user's own posts from GET /api/post?author=username
  */
 async function fetchAndRenderPosts(searchQuery = '') {
     const feedContainer = document.getElementById('dynamicFeed');
-    feedContainer.innerHTML = `<div class="text-center py-6 text-xs text-gray-400">Loading articles...</div>`;
+    feedContainer.innerHTML = `<div class="text-center py-6 text-xs text-gray-400">Loading your articles...</div>`;
 
     try {
-        const endpoint = searchQuery 
-            ? `${POST_URL}?search=${encodeURIComponent(searchQuery)}` 
-            : POST_URL;
+        // Query param passes author along with search
+        let endpoint = `${POST_URL}?author=${encodeURIComponent(currentUser.username)}`;
+        if (searchQuery) {
+            endpoint += `&search=${encodeURIComponent(searchQuery)}`;
+        }
 
         const res = await fetch(endpoint, {
             headers: { 'Authorization': `Bearer ${accessToken}` }
         });
 
-        if (!res.ok) throw new Error('Could not fetch posts');
+        if (!res.ok) throw new Error('Could not fetch articles');
 
         const posts = await res.json();
 
         if (!Array.isArray(posts) || posts.length === 0) {
             feedContainer.innerHTML = `
                 <div class="bg-white p-6 rounded-xl border border-gray-200 text-center text-xs text-gray-400">
-                    ${searchQuery ? `No posts matching "${escapeHTML(searchQuery)}"` : 'No articles available yet.'}
+                    ${searchQuery ? `No articles matching "${escapeHTML(searchQuery)}"` : 'You have not published any articles yet.'}
                 </div>`;
             return;
         }
 
-        const isAdmin = parseInt(currentUser.roles) === 2020;
-        const adminLoggedIn = isAdmin;
-
+        // Render user's personal posts with Delete buttons enabled
         feedContainer.innerHTML = posts.map(post => `
             <article class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3 hover:border-gray-300 transition relative">
                 <div class="flex items-center justify-between">
@@ -194,18 +147,17 @@ async function fetchAndRenderPosts(searchQuery = '') {
                             ${post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Just now'}
                         </span>
 
-                        ${adminLoggedIn ? `
-                            <button onclick="handleDeletePost('${post._id}')" 
-                                    class="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer transition px-2 py-0.5 rounded hover:bg-red-50 border border-transparent hover:border-red-200">
-                                🗑️ Delete
-                            </button>
-                        ` : ''}
+                        <!-- Owner Delete Button -->
+                        <button onclick="handleDeletePost('${post._id}')" 
+                                class="text-xs text-red-500 hover:text-red-700 font-medium cursor-pointer transition px-2 py-0.5 rounded hover:bg-red-50 border border-gray-200 hover:border-red-200">
+                            🗑️ Delete
+                        </button>
                     </div>
                 </div>
 
                 <div>
                     <h3 class="text-lg font-bold text-gray-900 leading-snug">${escapeHTML(post.title)}</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">By <span class="font-medium text-gray-700">@${escapeHTML(post.author || 'Anonymous')}</span></p>
+                    <p class="text-xs text-gray-500 mt-0.5">By <span class="font-medium text-gray-700">@${escapeHTML(post.author || currentUser.username)}</span></p>
                 </div>
 
                 <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">${escapeHTML(post.content)}</p>
@@ -213,16 +165,16 @@ async function fetchAndRenderPosts(searchQuery = '') {
         `).join('');
 
     } catch (err) {
-        console.error('Feed error:', err);
+        console.error('Profile Feed error:', err);
         feedContainer.innerHTML = `
             <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-xs text-center">
-                Failed to load articles.
+                Failed to load your articles.
             </div>`;
     }
 }
 
 /**
- * Admin Delete Request
+ * User Post Deletion Request
  */
 async function handleDeletePost(postId) {
     if (!confirm('Are you sure you want to delete this article?')) return;
@@ -240,10 +192,11 @@ async function handleDeletePost(postId) {
             throw new Error(data.message || 'Failed to delete post');
         }
 
+        // Re-fetch personal posts
         fetchAndRenderPosts();
 
     } catch (err) {
-        alert(`catching an error : ${err.message}`);
+        alert(`Error deleting post: ${err.message}`);
     }
 }
 

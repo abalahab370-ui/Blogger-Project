@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSpace Hub - My Profile</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="border-b border-gray-200 bg-white sticky top-0 z-50">
+        <div class="max-w-2xl mx-auto px-4 h-16 flex justify-between items-center">
+            <h1 class="font-bold text-lg text-gray-900 flex items-center gap-2">
+                 DevSpace Hub
+            </h1>
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <p id="userGreeting" class="text-sm font-semibold text-gray-900">Guest</p>
+                    <p id="userRoleBadge" class="text-[10px] uppercase font-mono tracking-wider text-gray-400">Loading profile...</p>
+                </div>
+                <a href="index.html" class="text-xs border border-gray-300 bg-white hover:bg-gray-100 px-3 py-1.5 rounded text-gray-700 font-medium transition flex items-center gap-1">
+                     Main Feed
+                </a>
+                <button id="logoutBtn" class="text-xs border border-gray-300 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded text-gray-600 font-medium cursor-pointer transition">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Centered Stack Workspace -->
+    <main class="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        
+        <!-- Profile Banner -->
+        <section class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+            <div>
+                <h2 id="profileHeaderName" class="text-lg font-bold text-gray-900">My Articles</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Manage and search through your published contributions.</p>
+            </div>
+            <div class="bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-lg text-xs font-semibold">
+                Personal Dashboard
+            </div>
+        </section>
+
+        <!-- Search Box (Scoped to user's posts) -->
+        <section>
+            <input type="text" id="searchBar" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm shadow-xs focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400" placeholder="🔍 Search your published articles by ( title / category ) live...">
+        </section>
+
+        <!-- Dynamic Post Feed for User's Posts -->
+        <section id="dynamicFeed" class="space-y-4">
+            <!-- profile.js renders personal posts here -->
+        </section>
+
+    </main>
+
+    <!-- Connected directly to profile.js -->
+    <script src="profile.js"></script>
+    <script>initProfileHub();</script>
+</body>
+</html>

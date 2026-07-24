@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevSpace Hub</title>
+    <title>DevSpace Hub - Feed</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
@@ -14,11 +14,14 @@
             <h1 class="font-bold text-lg text-gray-900 flex items-center gap-2">
                  DevSpace Hub
             </h1>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
                 <div class="text-right">
                     <p id="userGreeting" class="text-sm font-semibold text-gray-900">Guest</p>
                     <p id="userRoleBadge" class="text-[10px] uppercase font-mono tracking-wider text-gray-400">Loading profile...</p>
                 </div>
+                <a href="profile.html" class="text-xs border border-gray-300 bg-white hover:bg-gray-100 px-3 py-1.5 rounded text-gray-700 font-medium transition flex items-center gap-1">
+                    My Profile
+                </a>
                 <button id="logoutBtn" class="text-xs border border-gray-300 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded text-gray-600 font-medium cursor-pointer transition">
                     Logout
                 </button>
@@ -59,10 +62,10 @@
 
         <!-- 2. Search Box -->
         <section>
-            <input type="text" id="searchBar" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm shadow-xs focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400" placeholder="🔍 Search articles by title live...">
+            <input type="text" id="searchBar" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm shadow-xs focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder-gray-400" placeholder="🔍 Search articles by ( title / author name / category ) live...">
         </section>
 
-        <!-- 3. Dynamic Post Feed (Displays directly under search) -->
+        <!-- 3. Dynamic Post Feed -->
         <section id="dynamicFeed" class="space-y-4">
             <!-- user.js renders post matching search here -->
         </section>
