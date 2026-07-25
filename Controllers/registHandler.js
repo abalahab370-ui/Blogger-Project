@@ -19,7 +19,7 @@ const registHandler = async (req , res) => {
             const duplicate = founduser ;
 
             if (duplicate) {
-                  return res.sendStatus(409);
+                  return res.sendStatus(409).text('This username already exist choose a different one');
             }
 
             const hashpwd = await bcrypt.hash(user.password , 10) ;
@@ -48,7 +48,7 @@ const registHandler = async (req , res) => {
             res.json ({accessToken}) ;
             } catch (err){
 
-                  console.error(`Sir We have an error in Registring users !`)
+                  console.error(`Sir We have an error in Registring users !`);
 
             } 
 }
