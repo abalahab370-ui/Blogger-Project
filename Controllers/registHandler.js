@@ -19,7 +19,7 @@ const registHandler = async (req , res) => {
             const duplicate = founduser ;
 
             if (duplicate) {
-                  return res.sendStatus(409).json({'message' :'This username already exist choose a different one'});
+                  return res.status(409).json({'message' :'This username already exist choose a different one'});
             }
 
             const hashpwd = await bcrypt.hash(user.password , 10) ;

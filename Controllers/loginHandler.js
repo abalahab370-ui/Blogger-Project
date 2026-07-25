@@ -50,7 +50,7 @@ const loginHandler = async (req , res) => {
             res.json ({accessToken}) ;
 
             } else {
-                  return res.sendStatus(403)
+                  return res.status(403).json({'message' : 'wrong password or username'})
             }
 
             
