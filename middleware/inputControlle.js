@@ -1,7 +1,7 @@
 const { z } = require("zod") ;
 
 const registerSchema = z.object ({
-      username : z.string().min(4 , "Username must be at least 4 characters") ,
+      username : z.string({invalid_type_error: "Username must be text"}).min(4 , "Username must be at least 4 characters") ,
       password : z.string().min(6 , "password must be at least 6 characters")
 }) ;
 
