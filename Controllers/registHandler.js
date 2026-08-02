@@ -23,7 +23,7 @@ const registHandler = async (req , res) => {
             }
 
             const hashpwd = await bcrypt.hash(user.password , 10) ;
-
+            console.log(user.password) ;
             const accessToken = jwt.sign(
                   {"userInfo" : {
                          username : user.username 
