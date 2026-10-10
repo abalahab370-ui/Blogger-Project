@@ -31,6 +31,10 @@ app.use( (req ,res,next) => {
       next();
 })
 
+app.get("/ping" , (req, res) => {
+  return res.status(200).send("OK");
+});
+
 //3-Starting To Handle Row req ( post , req , get , put ) ! 
 
 app.use('/api' , require("./routing/login") ) ;
